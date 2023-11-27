@@ -7,7 +7,7 @@ from core.wireguard.models import Devices, Device
 from dotenv import load_dotenv
 
 load_dotenv()
-path = os.environ.get("CONFIG_PATH", "test")
+path = os.environ.get("CONFIG_PATH")
 
 
 def get_interface(path: str) -> tuple[str, str]:
@@ -68,7 +68,7 @@ def get_wg_peers(name: str) -> str:
 # DELETE
 
 
-def del_wg_interface(name: str):
+def del_wg_interface(name: str) -> str:
     conf_file = f"{path}/{name}.conf"
     try:
         os.remove(conf_file)
