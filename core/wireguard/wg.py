@@ -38,7 +38,6 @@ def get_wg_interfaces() -> List[Devices]:
     return devices
 
 
-
 def get_wg_interface(name: str) -> List[Device]:
     conf_file = f"{path}/{name}.conf"
     interface, peers = get_interface(conf_file)
@@ -75,3 +74,15 @@ def del_wg_interface(name: str) -> str:
         return [{"device": name, "state": "Deleted"}]
     except:
         return [{"device": name, "state": "Not Found"}]
+
+
+def del_wg_peer(name: str, public_key: str) -> str:
+    try:
+        conf_file = f"{path}/{name}.conf"
+        wc = wgconfig.WGConfig(conf_file)
+        wc.read_file()
+        wc.del_peer(public_key)
+        wc.write_file()
+        return [{"peer": public_key, "state": "Deleted"}]
+    except:
+        return [{"peer": name, "state": "Not Found"}]

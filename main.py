@@ -38,3 +38,8 @@ def get_peers(name: str):
 @app.delete("/interface/{name}")
 def del_interface(name: str):
     return wg.del_wg_interface(name)
+
+
+@app.delete("/interface/{name}/peer")
+def del_peer(name: str, public_key: str):
+    return wg.del_wg_peer(name, public_key)
