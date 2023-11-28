@@ -1,8 +1,8 @@
 from fastapi import FastAPI
-from typing import List
+from typing import List, Optional
 from core.wireguard import models
-from core.wireguard import get_wg, delete_wg
-
+from core.wireguard import get_wg, delete_wg, post_wg
+from fastapi.responses import FileResponse
 
 app = FastAPI(
     title="Test"
@@ -29,6 +29,12 @@ def get_peers(name: str):
     return {"peers": peers}
 
 # POST
+
+
+@app.post("/interface/{name}/peer")
+def create_peer(name: str, public_key: Optional[str] = None, presharedey: Optional[bool] = None ):
+    file, filename = post_wg.create_wg_peer(name, public_key, presharedey)
+    return FileResponse(file, filename=filename, media_type="application/octet-stream")
 
 # PATCH
 
