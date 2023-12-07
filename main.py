@@ -28,6 +28,18 @@ def get_peers(name: str):
     peers = get_wg.get_wg_peers(name)
     return {"peers": peers}
 
+
+@app.get("/interface/{name}/peer")
+def get_peers(name: str, public_key: str):
+    config, qr = get_wg.get_wg_peer_config(name, public_key)
+    return  FileResponse(config, filename="wgclient.conf", media_type="application/octet-stream")
+
+
+@app.get("/interface/{name}/peer/quick")
+def get_peers(name: str, public_key: str):
+    config, qr = get_wg.get_wg_peer_config(name, public_key)
+    return  FileResponse(qr, filename="qr.png", media_type="application/octet-stream")
+
 # POST
 
 
