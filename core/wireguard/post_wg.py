@@ -5,7 +5,7 @@ import wgconfig
 import wgconfig.wgexec as wgexec
 from dotenv import load_dotenv
 
-
+from core.wireguard.wg import genetate_qr
 from core.wireguard.get_wg import get_wg_peers
 
 
@@ -73,6 +73,7 @@ def create_wg_peer(interface: str, private_key: str, presharedkey: bool):
                 f'PersistentKeepalive = 10\n'
                 f'{f"PresharedKey = {key} \n" if presharedkey else ""}'
             )
-        
+    genetate_qr(f'{client_config_path}/{client_directory}/wgclient.conf', f'{client_config_path}/{client_directory}')
+
     return f'{client_config_path}/{client_directory}/wgclient.conf', "wgclient.conf"
  
