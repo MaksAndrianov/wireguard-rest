@@ -32,8 +32,8 @@ def get_peers(name: str):
 
 
 @app.post("/interface/{name}/peer")
-def create_peer(name: str, public_key: Optional[str] = None, presharedey: Optional[bool] = None ):
-    file, filename = post_wg.create_wg_peer(name, public_key, presharedey)
+def create_peer(name: str, private_key: Optional[str] = None, presharedey: Optional[bool] = None ):
+    file, filename = post_wg.create_wg_peer(name, private_key, presharedey)
     return FileResponse(file, filename=filename, media_type="application/octet-stream")
 
 # PATCH

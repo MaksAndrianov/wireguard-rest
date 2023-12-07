@@ -1,5 +1,6 @@
 import os
 import ipaddress
+import requests
 import wgconfig
 import wgconfig.wgexec as wgexec
 from dotenv import load_dotenv
@@ -15,15 +16,23 @@ DNS = os.environ.get("DNS")
 SERVER_IP = os.environ.get("SERVER_IP")
 
 
-def create_wg_peer(interface: str, public_key: str, presharedkey: bool):
+if SERVER_IP is None:
+    response = requests.get('https://ipinfo.io/')
+    data = response.json()
+    SERVER_IP = data.get('ip')
+
+
+def create_wg_peer(interface: str, private_key: str, presharedkey: bool):
     conf_file = f"{path}/{interface}.conf"
     wc = wgconfig.WGConfig(conf_file)
     wc.read_file()
 
     server = wc.get_interface()
 
-    if public_key is None:
+    if private_key is None:
         private_key, public_key = wgexec.generate_keypair()
+    else: 
+        public_key = wgexec.get_publickey(private_key)
 
     client_directory = public_key.replace('/', '%2F')
     get_peer = get_wg_peers(interface)
@@ -62,9 +71,8 @@ def create_wg_peer(interface: str, public_key: str, presharedkey: bool):
                 f"AllowedIPs = 0.0.0.0/0 \n"
                 f'Endpoint = {SERVER_IP}:{server["ListenPort"]}\n'
                 f'PersistentKeepalive = 10\n'
-                f'{f"PresharedKey = {key}" if presharedkey else ""}'
+                f'{f"PresharedKey = {key} \n" if presharedkey else ""}'
             )
         
     return f'{client_config_path}/{client_directory}/wgclient.conf', "wgclient.conf"
-        #print(client_directory.replace("%2F", "/"))
  
