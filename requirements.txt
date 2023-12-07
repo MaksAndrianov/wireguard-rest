@@ -2,3 +2,4 @@ fastapi[all]
 pydantic==2.5.2
 wgconfig==1.0.0
 qrcode==7.4.2
+requests==2.31.0
