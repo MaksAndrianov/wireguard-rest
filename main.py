@@ -3,9 +3,10 @@ from typing import List, Optional
 from core.wireguard import models
 from core.wireguard import get_wg, delete_wg, post_wg
 from fastapi.responses import FileResponse
+from fastapi import HTTPException
 
 app = FastAPI(
-    title="Test"
+    title="Wireguard Rest API"
 )
 
 # GET
@@ -13,40 +14,64 @@ app = FastAPI(
 
 @app.get("/interfaces", response_model=List[models.Devices])
 def get_interfaces():
-    devices = get_wg.get_wg_interfaces()
-    return devices
+    try:
+        devices = get_wg.get_wg_interfaces()
+        return devices
+    except Exception as Error:
+        print(Error)
+        raise HTTPException(status_code=404, detail="Not found")
 
 
 @app.get("/interface/{name}", response_model=models.Device)
 def get_interface(name: str):
-    device = get_wg.get_wg_interface(name)
-    return device
+    try: 
+        device = get_wg.get_wg_interface(name)
+        return device
+    except Exception as Error:
+        print(Error)
+        raise HTTPException(status_code=404, detail="Not found")
 
 
 @app.get("/interface/{name}/peers", response_model=models.Peers)
 def get_peers(name: str):
-    peers = get_wg.get_wg_peers(name)
-    return {"peers": peers}
+    try:
+        peers = get_wg.get_wg_peers(name)
+        return {"peers": peers}
+    except Exception as Error:
+        print(Error)
+        raise HTTPException(status_code=404, detail="Not found")
 
 
 @app.get("/interface/{name}/peer")
 def get_peers(name: str, public_key: str):
-    config, qr = get_wg.get_wg_peer_config(name, public_key)
-    return  FileResponse(config, filename="wgclient.conf", media_type="application/octet-stream")
+    try:
+        config, qr = get_wg.get_wg_peer_config(name, public_key)
+        return  FileResponse(config, filename="wgclient.conf", media_type="application/octet-stream")
+    except Exception as Error:
+        print(Error)
+        raise HTTPException(status_code=404, detail="Not found")
 
 
 @app.get("/interface/{name}/peer/quick")
 def get_peers(name: str, public_key: str):
-    config, qr = get_wg.get_wg_peer_config(name, public_key)
-    return  FileResponse(qr, filename="qr.png", media_type="application/octet-stream")
+    try:
+        config, qr = get_wg.get_wg_peer_config(name, public_key)
+        return  FileResponse(qr, filename="qr.png", media_type="application/octet-stream")
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=404, detail="Not found")
 
 # POST
 
 
 @app.post("/interface/{name}/peer")
 def create_peer(name: str, private_key: Optional[str] = None, presharedey: Optional[bool] = None ):
-    file, filename = post_wg.create_wg_peer(name, private_key, presharedey)
-    return FileResponse(file, filename=filename, media_type="application/octet-stream")
+    try:
+        file, filename = post_wg.create_wg_peer(name, private_key, presharedey)
+        return FileResponse(file, filename=filename, media_type="application/octet-stream")
+    except Exception as Error:
+        print(Error)
+        raise HTTPException(status_code=404, detail="Not found")
 
 # PATCH
 
@@ -55,9 +80,17 @@ def create_peer(name: str, private_key: Optional[str] = None, presharedey: Optio
 
 @app.delete("/interface/{name}")
 def del_interface(name: str):
-    return delete_wg.del_wg_interface(name)
+    try: 
+        return delete_wg.del_wg_interface(name)
+    except Exception as Error:
+        print(Error)
+        raise HTTPException(status_code=404, detail="Not found")
 
 
 @app.delete("/interface/{name}/peer")
 def del_peer(name: str, public_key: str):
-    return delete_wg.del_wg_peer(name, public_key)
+    try:
+        return delete_wg.del_wg_peer(name, public_key)
+    except Exception as Error:
+        print(Error)
+        raise HTTPException(status_code=404, detail="Not found")
