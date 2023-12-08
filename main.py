@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from typing import List, Optional
 from core.wireguard import models
 from core.wireguard import get_wg, delete_wg, post_wg
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi import HTTPException
 
 app = FastAPI(
@@ -69,6 +69,19 @@ def create_peer(name: str, private_key: Optional[str] = None, presharedey: Optio
     try:
         file, filename = post_wg.create_wg_peer(name, private_key, presharedey)
         return FileResponse(file, filename=filename, media_type="application/octet-stream")
+    except Exception as Error:
+        print(Error)
+        raise HTTPException(status_code=404, detail="Not found")
+
+
+@app.post("/interface/{name}")
+def create_peer(name: str, server_ip: Optional[str] = None, port: Optional[int] = None, preup: Optional[str] = None, postup: Optional[str] = None, predown: Optional[str] = None, postdown: Optional[str] = None):
+    try:
+        device = post_wg.create_wg_interface(name, server_ip, port, preup, postup, predown, postdown)
+        if device is not None:
+            return device
+        else:
+            return JSONResponse(content={"detail": "Item already exist"}, status_code=409)
     except Exception as Error:
         print(Error)
         raise HTTPException(status_code=404, detail="Not found")

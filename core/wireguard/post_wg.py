@@ -6,7 +6,7 @@ import wgconfig.wgexec as wgexec
 from dotenv import load_dotenv
 
 from core.wireguard.wg import genetate_qr
-from core.wireguard.get_wg import get_wg_peers
+from core.wireguard.get_wg import get_wg_peers, get_wg_interface
 
 
 load_dotenv()
@@ -14,6 +14,11 @@ path = os.environ.get("CONFIG_PATH")
 client_config_path = os.environ.get("CLIENT_CONFIG_PATH")
 DNS = os.environ.get("DNS")
 SERVER_IP = os.environ.get("SERVER_IP")
+# Server env
+SERVER_ADDRESS = os.environ.get("ADDRESS")
+SERVER_PORT = os.environ.get("PORT")
+POSTUP = os.environ.get("POSTUP")
+POSTDOWN = os.environ.get("POSTDOWN")
 
 
 if SERVER_IP is None:
@@ -77,3 +82,22 @@ def create_wg_peer(interface: str, private_key: str, presharedkey: bool):
 
     return f'{client_config_path}/{client_directory}/wgclient.conf', "wgclient.conf"
  
+
+def create_wg_interface(name: str, server_ip: str, port: int, preup: str, postup: str, predown: str, postdown: str):
+    conf_file = f"{path}/{name}.conf"
+    if os.path.exists(conf_file):
+        return None
+    else:
+        private_key, public_key = wgexec.generate_keypair()
+        with open(conf_file, 'w') as file:
+            file.write(f"[Interface]\n")
+            file.write(f"Address = {SERVER_ADDRESS}\n" if server_ip is None else f"Address = {server_ip}\n")
+            file.write(f"ListenPort = {SERVER_PORT}\n" if port is None else f"ListenPort = {port}\n")
+            file.write(f"PrivateKey = {private_key}\n")
+            if preup is not None:
+                file.write(f"PreUp = {preup}\n") 
+            file.write(f"PostUp = {POSTUP}\n" if postup is None else f"PostUp = {postup}\n")
+            if predown is not None:
+                file.write(f"PreDown = {predown}\n")
+            file.write(f"PostDown = {POSTDOWN}\n" if postup is None else f"PostDown = {postup}\n")
+        return get_wg_interface(name)
