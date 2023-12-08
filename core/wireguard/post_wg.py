@@ -52,7 +52,10 @@ def create_wg_peer(interface: str, private_key: str, presharedkey: bool):
 
         # IP 
         possible_ips = set(ipaddress.IPv4Network(item.get("AllowedIPs")) for item in get_peer.values() if "AllowedIPs" in item)
-        all_possible_ips = set(ipaddress.IPv4Network(f"10.0.0.{i}/32") for i in range(2, 254))
+        server_gateway_ip = server["Address"]
+        ip_prefix = ".".join(server_gateway_ip.split(".")[:-1])
+
+        all_possible_ips = set(ipaddress.IPv4Network(f"{ip_prefix}.{i}/32") for i in range(2, 254))
         free_ips = all_possible_ips - possible_ips
         first_free_ip = list(free_ips)[-1] if free_ips else None
 
