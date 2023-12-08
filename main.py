@@ -75,7 +75,7 @@ def create_peer(name: str, private_key: Optional[str] = None, presharedey: Optio
 
 
 @app.post("/interface/{name}")
-def create_peer(name: str, server_ip: Optional[str] = None, port: Optional[int] = None, preup: Optional[str] = None, postup: Optional[str] = None, predown: Optional[str] = None, postdown: Optional[str] = None):
+def create_interface(name: str, server_ip: Optional[str] = None, port: Optional[int] = None, preup: Optional[str] = None, postup: Optional[str] = None, predown: Optional[str] = None, postdown: Optional[str] = None):
     try:
         device = post_wg.create_wg_interface(name, server_ip, port, preup, postup, predown, postdown)
         if device is not None:
