@@ -50,6 +50,12 @@ def get_wg_peers(interface: str) -> str:
     return peers
 
 
+def get_wg_peer(interface: str, peer: str):
+    conf_file = f"{path}/{interface}.conf"
+    interface, peers = get_interface(conf_file)
+    return peers[peer]
+
+
 def get_wg_peer_config(interface: str, public_key: str):
     client_directory = public_key.replace('/', '%2F')
     get_peer = get_wg_peers(interface)

@@ -41,11 +41,12 @@ def create_wg_peer(interface: str, private_key: str, presharedkey: bool):
 
     client_directory = public_key.replace('/', '%2F')
     get_peer = get_wg_peers(interface)
-    test=get_peer[public_key] if public_key in get_peer else None,
+    check=get_peer[public_key] if public_key in get_peer else None,
 
-    if os.path.exists(f"{client_config_path}/{client_directory}") or test[0] is not None:
+    if os.path.exists(f"{client_config_path}/{client_directory}") or check[0] is not None:
         return 404
-    else:    
+    else:
+        # Maybe it needs to be moved to a separate function, as it is done for QR code generation?
         os.makedirs(f"{client_config_path}/{client_directory}")
 
         wc.add_peer(public_key)
@@ -83,7 +84,7 @@ def create_wg_peer(interface: str, private_key: str, presharedkey: bool):
             )
     genetate_qr(f'{client_config_path}/{client_directory}/wgclient.conf', f'{client_config_path}/{client_directory}')
 
-    return f'{client_config_path}/{client_directory}/wgclient.conf', "wgclient.conf"
+    return {"detail": "created", "peer": public_key}
  
 
 def create_wg_interface(name: str, server_ip: str, port: int, preup: str, postup: str, predown: str, postdown: str):

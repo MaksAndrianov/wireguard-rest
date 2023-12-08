@@ -32,6 +32,16 @@ def get_interface(name: str):
         raise HTTPException(status_code=404, detail="Not found")
 
 
+@app.get("/interface/{name}/peer")
+def get_peer(name: str, public_key: str):
+    try:
+        peer = get_wg.get_wg_peer(name, public_key)
+        return(peer)
+    except Exception as Error:
+        print(Error)
+        raise HTTPException(status_code=404, detail="Not found")
+
+
 @app.get("/interface/{name}/peers", response_model=models.Peers)
 def get_peers(name: str):
     try:
@@ -42,8 +52,8 @@ def get_peers(name: str):
         raise HTTPException(status_code=404, detail="Not found")
 
 
-@app.get("/interface/{name}/peer")
-def get_peers(name: str, public_key: str):
+@app.get("/interface/{name}/peer/config")
+def get_peer_config(name: str, public_key: str):
     try:
         config, qr = get_wg.get_wg_peer_config(name, public_key)
         return  FileResponse(config, filename="wgclient.conf", media_type="application/octet-stream")
@@ -53,7 +63,7 @@ def get_peers(name: str, public_key: str):
 
 
 @app.get("/interface/{name}/peer/quick")
-def get_peers(name: str, public_key: str):
+def get_peer_qr(name: str, public_key: str):
     try:
         config, qr = get_wg.get_wg_peer_config(name, public_key)
         return  FileResponse(qr, filename="qr.png", media_type="application/octet-stream")
@@ -67,8 +77,8 @@ def get_peers(name: str, public_key: str):
 @app.post("/interface/{name}/peer")
 def create_peer(name: str, private_key: Optional[str] = None, presharedey: Optional[bool] = None ):
     try:
-        file, filename = post_wg.create_wg_peer(name, private_key, presharedey)
-        return FileResponse(file, filename=filename, media_type="application/octet-stream")
+        peer = post_wg.create_wg_peer(name, private_key, presharedey)
+        return peer
     except Exception as Error:
         print(Error)
         raise HTTPException(status_code=404, detail="Not found")
