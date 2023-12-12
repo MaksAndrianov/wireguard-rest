@@ -83,7 +83,7 @@ def get_peer_qr(
         location: Optional[str] = None
     ):
     try:
-        config, qr = get_wg.get_wg_peer_config(name, public_key)
+        config, qr = get_wg.get_wg_peer_config(name, public_key, location)
         return  FileResponse(qr, filename="qr.png", media_type="application/octet-stream")
     except Exception as e:
         print(e)
