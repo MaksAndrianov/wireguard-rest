@@ -27,7 +27,7 @@ if SERVER_IP is None:
     SERVER_IP = data.get('ip')
 
 
-def create_wg_peer(interface: str, private_key: str, presharedkey: bool, location: str):
+def create_wg_peer(interface: str, serer_ip: str, private_key: str, presharedkey: bool, location: str):
     conf_file = config_location(location, interface)
 
     wc = wgconfig.WGConfig(conf_file)
@@ -62,7 +62,9 @@ def create_wg_peer(interface: str, private_key: str, presharedkey: bool, locatio
         possible_ips = set(ipaddress.IPv4Network(item.get("AllowedIPs")) for item in get_peer.values() if "AllowedIPs" in item)
         server_gateway_ip = server["Address"]
         ip_prefix = ".".join(server_gateway_ip.split(".")[:-1])
-
+        if serer_ip is None:
+            serer_ip = SERVER_IP
+    
         all_possible_ips = set(ipaddress.IPv4Network(f"{ip_prefix}.{i}/32") for i in range(2, 254))
         free_ips = all_possible_ips - possible_ips
         first_free_ip = list(free_ips)[-1] if free_ips else None
@@ -85,7 +87,7 @@ def create_wg_peer(interface: str, private_key: str, presharedkey: bool, locatio
                 f'[Peer]\n'
                 f'PublicKey = {wgexec.get_publickey(server["PrivateKey"])}\n'
                 f"AllowedIPs = 0.0.0.0/0 \n"
-                f'Endpoint = {SERVER_IP}:{server["ListenPort"]}\n'
+                f'Endpoint = {serer_ip}:{server["ListenPort"]}\n'
                 f'PersistentKeepalive = 10\n'
                 f'{f"PresharedKey = {key} \n" if presharedkey else ""}'
             )

@@ -95,12 +95,13 @@ def get_peer_qr(
 @app.post("/interface/{name}/peer")
 def create_peer(
         name: str,
+        server_ip: Optional[str] = None,
         private_key: Optional[str] = None,
         presharedey: Optional[bool] = None,
         location: Optional[str] = None
     ):
     try:
-        peer = post_wg.create_wg_peer(name, private_key, presharedey, location)
+        peer = post_wg.create_wg_peer(name, server_ip, private_key, presharedey, location)
         return peer
     except Exception as Error:
         print(Error)
