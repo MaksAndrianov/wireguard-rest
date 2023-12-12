@@ -23,9 +23,12 @@ def get_interfaces():
 
 
 @app.get("/interface/{name}", response_model=models.Device)
-def get_interface(name: str):
+def get_interface(
+        name: str,
+        location: Optional[str] = None
+    ):
     try: 
-        device = get_wg.get_wg_interface(name)
+        device = get_wg.get_wg_interface(name, location)
         return device
     except Exception as Error:
         print(Error)
@@ -33,9 +36,13 @@ def get_interface(name: str):
 
 
 @app.get("/interface/{name}/peer")
-def get_peer(name: str, public_key: str):
+def get_peer(
+        name: str,
+        public_key: str,
+        location: Optional[str] = None
+    ):
     try:
-        peer = get_wg.get_wg_peer(name, public_key)
+        peer = get_wg.get_wg_peer(name, public_key, location)
         return(peer)
     except Exception as Error:
         print(Error)
@@ -43,9 +50,12 @@ def get_peer(name: str, public_key: str):
 
 
 @app.get("/interface/{name}/peers", response_model=models.Peers)
-def get_peers(name: str):
+def get_peers(
+        name: str,
+        location: Optional[str] = None
+    ):
     try:
-        peers = get_wg.get_wg_peers(name)
+        peers = get_wg.get_wg_peers(name, location)
         return {"peers": peers}
     except Exception as Error:
         print(Error)
@@ -53,9 +63,13 @@ def get_peers(name: str):
 
 
 @app.get("/interface/{name}/peer/config")
-def get_peer_config(name: str, public_key: str):
+def get_peer_config(
+        name: str,
+        public_key: str,
+        location: Optional[str] = None
+    ):
     try:
-        config, qr = get_wg.get_wg_peer_config(name, public_key)
+        config, qr = get_wg.get_wg_peer_config(name, public_key, location)
         return  FileResponse(config, filename="wgclient.conf", media_type="application/octet-stream")
     except Exception as Error:
         print(Error)
@@ -63,7 +77,11 @@ def get_peer_config(name: str, public_key: str):
 
 
 @app.get("/interface/{name}/peer/quick")
-def get_peer_qr(name: str, public_key: str):
+def get_peer_qr(
+        name: str,
+        public_key: str,
+        location: Optional[str] = None
+    ):
     try:
         config, qr = get_wg.get_wg_peer_config(name, public_key)
         return  FileResponse(qr, filename="qr.png", media_type="application/octet-stream")
@@ -75,9 +93,14 @@ def get_peer_qr(name: str, public_key: str):
 
 
 @app.post("/interface/{name}/peer")
-def create_peer(name: str, private_key: Optional[str] = None, presharedey: Optional[bool] = None ):
+def create_peer(
+        name: str,
+        private_key: Optional[str] = None,
+        presharedey: Optional[bool] = None,
+        location: Optional[str] = None
+    ):
     try:
-        peer = post_wg.create_wg_peer(name, private_key, presharedey)
+        peer = post_wg.create_wg_peer(name, private_key, presharedey, location)
         return peer
     except Exception as Error:
         print(Error)
@@ -85,9 +108,18 @@ def create_peer(name: str, private_key: Optional[str] = None, presharedey: Optio
 
 
 @app.post("/interface/{name}")
-def create_interface(name: str, server_ip: Optional[str] = None, port: Optional[int] = None, preup: Optional[str] = None, postup: Optional[str] = None, predown: Optional[str] = None, postdown: Optional[str] = None):
+def create_interface(
+        name: str,
+        server_ip: Optional[str] = None,
+        port: Optional[int] = None,
+        preup: Optional[str] = None,
+        postup: Optional[str] = None,
+        predown: Optional[str] = None,
+        postdown: Optional[str] = None,
+        location: Optional[str] = None
+    ):
     try:
-        device = post_wg.create_wg_interface(name, server_ip, port, preup, postup, predown, postdown)
+        device = post_wg.create_wg_interface(name, server_ip, port, preup, postup, predown, postdown, location)
         if device is not None:
             return device
         else:
@@ -102,18 +134,25 @@ def create_interface(name: str, server_ip: Optional[str] = None, port: Optional[
 
 
 @app.delete("/interface/{name}")
-def del_interface(name: str):
+def del_interface(
+        name: str,
+        location: Optional[str] = None
+    ):
     try: 
-        return delete_wg.del_wg_interface(name)
+        return delete_wg.del_wg_interface(name, location)
     except Exception as Error:
         print(Error)
         raise HTTPException(status_code=404, detail="Not found")
 
 
 @app.delete("/interface/{name}/peer")
-def del_peer(name: str, public_key: str):
+def del_peer(
+        name: str,
+        public_key: str,
+        location: Optional[str] = None
+    ):
     try:
-        return delete_wg.del_wg_peer(name, public_key)
+        return delete_wg.del_wg_peer(name, public_key, location)
     except Exception as Error:
         print(Error)
         raise HTTPException(status_code=404, detail="Not found")

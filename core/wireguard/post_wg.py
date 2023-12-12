@@ -6,7 +6,7 @@ import wgconfig.wgexec as wgexec
 from dotenv import load_dotenv
 
 from core.wireguard.wg import genetate_qr
-from core.wireguard.get_wg import get_wg_peers, get_wg_interface
+from core.wireguard.get_wg import get_wg_peers, get_wg_interface, config_location
 
 
 load_dotenv()
@@ -27,8 +27,9 @@ if SERVER_IP is None:
     SERVER_IP = data.get('ip')
 
 
-def create_wg_peer(interface: str, private_key: str, presharedkey: bool):
-    conf_file = f"{path}/{interface}.conf"
+def create_wg_peer(interface: str, private_key: str, presharedkey: bool, location: str):
+    conf_file = config_location(location, interface)
+
     wc = wgconfig.WGConfig(conf_file)
     wc.read_file()
 
@@ -39,8 +40,14 @@ def create_wg_peer(interface: str, private_key: str, presharedkey: bool):
     else: 
         public_key = wgexec.get_publickey(private_key)
 
-    client_directory = public_key.replace('/', '%2F')
-    get_peer = get_wg_peers(interface)
+    # Put it in a separate function
+    client = public_key.replace('/', '%2F')
+    if location is None:
+        client_directory = client
+    else:
+        client_directory = f"{location}/{client}"
+
+    get_peer = get_wg_peers(interface, location)
     check=get_peer[public_key] if public_key in get_peer else None,
 
     if os.path.exists(f"{client_config_path}/{client_directory}") or check[0] is not None:
@@ -87,8 +94,12 @@ def create_wg_peer(interface: str, private_key: str, presharedkey: bool):
     return {"detail": "created", "peer": public_key}
  
 
-def create_wg_interface(name: str, server_ip: str, port: int, preup: str, postup: str, predown: str, postdown: str):
-    conf_file = f"{path}/{name}.conf"
+def create_wg_interface(name: str, server_ip: str, port: int, preup: str, postup: str, predown: str, postdown: str, location: str):
+    if location is None:
+        conf_file = f"{path}/{name}.conf"
+    else:
+        conf_file = f"{path}/{location}/{name}.conf"
+        os.makedirs(f"{path}/{location}")
     if os.path.exists(conf_file):
         return None
     else:
@@ -103,5 +114,5 @@ def create_wg_interface(name: str, server_ip: str, port: int, preup: str, postup
             file.write(f"PostUp = {POSTUP}\n" if postup is None else f"PostUp = {postup}\n")
             if predown is not None:
                 file.write(f"PreDown = {predown}\n")
-            file.write(f"PostDown = {POSTDOWN}\n" if postup is None else f"PostDown = {postup}\n")
-        return get_wg_interface(name)
+            file.write(f"PostDown = {POSTDOWN}\n" if postdown is None else f"PostDown = {postdown}\n")
+        return get_wg_interface(name, location)

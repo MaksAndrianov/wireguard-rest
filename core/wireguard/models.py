@@ -4,6 +4,7 @@ from typing import Optional
 
 class Devices(BaseModel):
     device: str
+    location: Optional[str] = None
     public_key: str
     listen_port: int
 

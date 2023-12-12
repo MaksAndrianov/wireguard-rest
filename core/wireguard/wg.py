@@ -5,8 +5,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 path = os.environ.get("CONFIG_PATH")
-client_config_path = os.environ.get("CLIENT_CONFIG_PATH")
 DNS = os.environ.get("DNS")
+
+
+def get_location(file_path: str):
+    pre_loc = file_path.replace(f'{path}/', "")
+    if pre_loc.replace(f'/{get_name_interface(file_path)}.conf', "") == f"{get_name_interface(file_path)}.conf":
+        return None
+    else:
+        return pre_loc.replace(f'/{get_name_interface(file_path)}.conf', "")
+    
+
+def config_location(location, interface):
+    if location is None:
+        return f"{path}/{interface}.conf"
+    else:
+        return f"{path}/{location}/{interface}.conf"
 
 
 def get_interface(path: str) -> tuple[str, str]:
