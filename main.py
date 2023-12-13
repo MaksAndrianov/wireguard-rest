@@ -117,12 +117,12 @@ def create_peer(
         name: str,
         server_ip: Optional[str] = None,
         private_key: Optional[str] = None,
-        presharedey: Optional[bool] = None,
+        preshare_key: Optional[bool] = None,
         location: Optional[str] = None,
         token: str = Depends(check_token)
     ):
     try:
-        peer = post_wg.create_wg_peer(name, server_ip, private_key, presharedey, location)
+        peer = post_wg.create_wg_peer(name, server_ip, private_key, preshare_key, location)
         return peer
     except Exception as Error:
         print(Error)
