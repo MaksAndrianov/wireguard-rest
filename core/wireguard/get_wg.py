@@ -14,7 +14,7 @@ client_config_path = os.environ.get("CLIENT_CONFIG_PATH")
 
 
 def get_wg_interfaces() -> List[Devices]:
-    conf_files = glob.glob(os.path.join(path, '**/*.conf'), recursive=True)
+    conf_files = glob.glob(os.path.join(path, '**/wg*.conf'), recursive=True)
     devices = []
     for file_path in conf_files:
         interface, peers = get_interface(file_path)
@@ -75,6 +75,6 @@ def get_wg_peer_config(interface: str, public_key: str, location: str):
     if not os.path.exists(f"{client_config_path}/{client_directory}") or check[0] is None:
         return 404
     else: 
-        config = f'{client_config_path}/{client_directory}/wgclient.conf'
+        config = f'{client_config_path}/{client_directory}/client.conf'
         qr = f'{client_config_path}/{client_directory}/qr.png'
         return config, qr

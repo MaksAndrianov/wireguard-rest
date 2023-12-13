@@ -31,7 +31,6 @@ def del_wg_peer(interface: str, public_key: str, location: str) -> str:
         wc.read_file()
         wc.del_peer(public_key)
         wc.write_file()
-        print(client_directory)
         try:
             files = os.listdir(client_directory)
             for file in files:

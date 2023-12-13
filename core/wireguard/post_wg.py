@@ -78,7 +78,7 @@ def create_wg_peer(interface: str, serer_ip: str, private_key: str, presharedkey
         wc.write_file()
 
 
-        with open(f'{client_config_path}/{client_directory}/wgclient.conf', 'w') as file:
+        with open(f'{client_config_path}/{client_directory}/client.conf', 'w') as file:
             file.write(
                 f"[Interface]\n"
                 f"PrivateKey = {private_key}\n"
@@ -91,7 +91,7 @@ def create_wg_peer(interface: str, serer_ip: str, private_key: str, presharedkey
                 f'PersistentKeepalive = 10\n'
                 f'{f"PresharedKey = {key} \n" if presharedkey else ""}'
             )
-    genetate_qr(f'{client_config_path}/{client_directory}/wgclient.conf', f'{client_config_path}/{client_directory}')
+    genetate_qr(f'{client_config_path}/{client_directory}/client.conf', f'{client_config_path}/{client_directory}')
 
     return {"detail": "created", "peer": public_key}
  
