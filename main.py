@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI, Depends
 from typing import List, Optional
-from core.wireguard import models
+from core.wireguard import models, patch_wg
 from core.wireguard import get_wg, delete_wg, post_wg
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi import HTTPException
@@ -152,6 +152,26 @@ def create_interface(
         raise HTTPException(status_code=404, detail="Not found")
 
 # PATCH
+
+
+@app.patch("/interface/{name}/peer")
+def edit_peer(
+        name: str, 
+        state: str,
+        public_key: str,
+        location: Optional[str] = None,
+        token: str = Depends(check_token)
+    ):
+    try:
+        if state == "disable":
+            patch_wg.disable_peer_wg(name, location, public_key)
+        elif state == "enable":
+            patch_wg.enable_peer_wg(name, location, public_key)
+        else: 
+            return 404
+    except Exception as Error:
+        print(Error)
+        raise HTTPException(status_code=404, detail="Not found")
 
 # DELETE
 
